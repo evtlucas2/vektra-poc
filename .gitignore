@@ -1,0 +1,7 @@
+venv
+
+.specify/scripts/
+.specify/extensions.yml
+.specify/extensions/
+.specify/init-options.json
+.specify/workflows/
