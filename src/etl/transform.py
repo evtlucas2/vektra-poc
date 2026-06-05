@@ -23,6 +23,16 @@ def _compute_hash(dtposted: str, trnamt: str, memo: str, name: str, label: str) 
     return hashlib.sha256(f"{dtposted}|{trnamt}|{memo}|{name}|{label}".encode()).hexdigest()
 
 
+def _resolve_effective_date(match, posted_date: date) -> date:
+    if not match:
+        return posted_date
+    try:
+        return _parse_effective_date(match.group(1), posted_date.year)
+    except (ValueError, OverflowError):
+        print(f"[WARN] Invalid MEMO date '{match.group(1)}', using posted_date", flush=True)
+        return posted_date
+
+
 def _transform_row(row: dict, account_label: str) -> Transaction | None:
     if row["NAME"] in FILTERED_NAMES:
         return None
@@ -34,7 +44,7 @@ def _transform_row(row: dict, account_label: str) -> Transaction | None:
         return None
     memo = row["MEMO"]
     match = MEMO_PATTERN.match(memo) if memo else None
-    effective_date = _parse_effective_date(match.group(1), posted_date.year) if match else None
+    effective_date = _resolve_effective_date(match, posted_date)
     description: str | None = match.group(2) if match else (memo if memo else None)
     return Transaction(
         posted_date=posted_date,

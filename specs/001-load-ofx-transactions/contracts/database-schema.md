@@ -8,11 +8,11 @@
 > for the full DDL history.
 
 ```sql
--- After migration 0002_add_account_label (feature 002):
+-- After migration 0003_effective_date_not_null (feature 003):
 CREATE TABLE IF NOT EXISTS transactions (
     id               SERIAL PRIMARY KEY,
     posted_date      DATE           NOT NULL,
-    effective_date   DATE,
+    effective_date   DATE           NOT NULL,
     description      TEXT,
     amount           NUMERIC(15, 2) NOT NULL,
     account_label    TEXT           NOT NULL DEFAULT 'unknown',
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 |--------|----------|-------------|
 | `id` | NO | Auto-incrementing surrogate key |
 | `posted_date` | NO | Date the bank posted the transaction (from `DTPOSTED`) |
-| `effective_date` | YES | Derived date from MEMO pattern `DD/MM HH:MM`; null when pattern not matched |
+| `effective_date` | NO | Derived from MEMO pattern `DD/MM HH:MM` when present; otherwise equals `posted_date` (never null — feature 003) |
 | `description` | YES | Transaction description; from MEMO (full or split) |
 | `amount` | NO | Transaction amount; positive = credit, negative = debit |
 | `account_label` | NO | User-supplied account identifier (added in feature 002); rows from feature 001 default to `'unknown'` |
