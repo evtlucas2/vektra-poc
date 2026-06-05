@@ -30,17 +30,31 @@ def test_account_label_stored_on_transaction():
 def test_memo_pattern_splits_date_and_description():
     rows = [_raw(dtposted="20260510120000", memo="10/05 14:30 SUPERMERCADO ABC")]
     result = transform_transactions(rows, "checking")
-    assert len(result) == 1
     txn = result[0]
     assert txn.effective_date == date(2026, 5, 10)
     assert txn.description == "SUPERMERCADO ABC"
 
 
-def test_memo_no_pattern_stores_full_memo():
-    rows = [_raw(memo="Deposito salario")]
+def test_memo_no_pattern_effective_date_equals_posted_date():
+    rows = [_raw(dtposted="20260515000000", memo="Deposito salario")]
     result = transform_transactions(rows, "checking")
-    assert result[0].effective_date is None
+    assert result[0].effective_date == date(2026, 5, 15)
     assert result[0].description == "Deposito salario"
+
+
+def test_blank_memo_effective_date_equals_posted_date():
+    rows = [_raw(dtposted="20260520000000", memo="")]
+    result = transform_transactions(rows, "checking")
+    assert result[0].effective_date == date(2026, 5, 20)
+    assert result[0].description is None
+
+
+def test_effective_date_is_never_none():
+    rows = [_raw(memo="no date here"), _raw(memo="")]
+    result = transform_transactions(rows, "checking")
+    for txn in result:
+        assert txn.effective_date is not None
+        assert isinstance(txn.effective_date, date)
 
 
 def test_posted_date_parsed_from_dtposted():
@@ -69,8 +83,9 @@ def test_hash_consistent_same_label():
     assert r1[0].transaction_hash == r2[0].transaction_hash
 
 
-def test_blank_memo_gives_null_description():
-    rows = [_raw(memo="")]
+def test_invalid_memo_date_falls_back_to_posted_date():
+    # "31/02" matches the pattern but is not a valid calendar date
+    rows = [_raw(dtposted="20260201000000", memo="31/02 10:00 IMPOSSIBLE DATE")]
     result = transform_transactions(rows, "checking")
-    assert result[0].description is None
-    assert result[0].effective_date is None
+    assert len(result) == 1
+    assert result[0].effective_date == date(2026, 2, 1)

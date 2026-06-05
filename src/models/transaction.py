@@ -6,7 +6,7 @@ from decimal import Decimal
 @dataclass
 class Transaction:
     posted_date: date
-    effective_date: date | None
+    effective_date: date
     description: str | None
     amount: Decimal
     account_label: str

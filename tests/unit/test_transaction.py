@@ -21,15 +21,14 @@ def test_transaction_fields_all_present():
     assert t.transaction_hash == "abc123"
 
 
-def test_transaction_nullable_fields_accept_none():
+def test_transaction_effective_date_is_always_date():
     t = Transaction(
         posted_date=date(2026, 5, 10),
-        effective_date=None,
+        effective_date=date(2026, 5, 10),  # must be a date, not None
         description=None,
         amount=Decimal("5000.00"),
         account_label="savings",
         transaction_hash="def456",
     )
-    assert t.effective_date is None
+    assert isinstance(t.effective_date, date)
     assert t.description is None
-    assert t.account_label == "savings"
