@@ -9,4 +9,5 @@ class Transaction:
     effective_date: date | None
     description: str | None
     amount: Decimal
+    account_label: str
     transaction_hash: str
