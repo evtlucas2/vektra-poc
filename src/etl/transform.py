@@ -19,11 +19,11 @@ def _parse_effective_date(day_month: str, year: int) -> date:
     return date(year, int(month_str), int(day_str))
 
 
-def _compute_hash(dtposted: str, trnamt: str, memo: str, name: str) -> str:
-    return hashlib.sha256(f"{dtposted}|{trnamt}|{memo}|{name}".encode()).hexdigest()
+def _compute_hash(dtposted: str, trnamt: str, memo: str, name: str, label: str) -> str:
+    return hashlib.sha256(f"{dtposted}|{trnamt}|{memo}|{name}|{label}".encode()).hexdigest()
 
 
-def _transform_row(row: dict) -> Transaction | None:
+def _transform_row(row: dict, account_label: str) -> Transaction | None:
     if row["NAME"] in FILTERED_NAMES:
         return None
     try:
@@ -41,9 +41,10 @@ def _transform_row(row: dict) -> Transaction | None:
         effective_date=effective_date,
         description=description,
         amount=amount,
-        transaction_hash=_compute_hash(row["DTPOSTED"], row["TRNAMT"], memo, row["NAME"]),
+        account_label=account_label,
+        transaction_hash=_compute_hash(row["DTPOSTED"], row["TRNAMT"], memo, row["NAME"], account_label),
     )
 
 
-def transform_transactions(raw: list[dict]) -> list[Transaction]:
-    return [t for row in raw if (t := _transform_row(row)) is not None]
+def transform_transactions(raw: list[dict], account_label: str) -> list[Transaction]:
+    return [t for row in raw if (t := _transform_row(row, account_label)) is not None]

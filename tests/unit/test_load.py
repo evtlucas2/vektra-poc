@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.etl.load import create_table_if_not_exists, insert_transactions
+from src.etl.load import insert_transactions
 from src.models.transaction import Transaction
 
 
@@ -21,36 +21,29 @@ def mock_conn(cursor_mock):
     return conn
 
 
-def test_create_table_if_not_exists_executes_ddl(mock_conn, cursor_mock):
-    create_table_if_not_exists(mock_conn)
-    cursor_mock.execute.assert_called_once()
-    ddl = cursor_mock.execute.call_args[0][0]
-    assert "CREATE TABLE IF NOT EXISTS transactions" in ddl
-    assert "transaction_hash" in ddl
-    mock_conn.commit.assert_called_once()
+def _txn(label: str = "checking", hash_val: str = "hash1") -> Transaction:
+    return Transaction(
+        posted_date=date(2026, 5, 10),
+        effective_date=date(2026, 5, 10),
+        description="SUPERMERCADO",
+        amount=Decimal("-150.00"),
+        account_label=label,
+        transaction_hash=hash_val,
+    )
+
+
+def test_insert_includes_account_label(mock_conn, cursor_mock):
+    cursor_mock.rowcount = 1
+    insert_transactions(mock_conn, [_txn("checking", "h1")])
+    call_args = cursor_mock.execute.call_args[0]
+    sql, params = call_args[0], call_args[1]
+    assert "account_label" in sql
+    assert "checking" in params
 
 
 def test_insert_transactions_returns_inserted_count(mock_conn, cursor_mock):
     cursor_mock.rowcount = 1
-
-    txns = [
-        Transaction(
-            posted_date=date(2026, 5, 10),
-            effective_date=date(2026, 5, 10),
-            description="SUPERMERCADO",
-            amount=Decimal("-150.00"),
-            transaction_hash="hash1",
-        ),
-        Transaction(
-            posted_date=date(2026, 5, 15),
-            effective_date=None,
-            description="Deposito",
-            amount=Decimal("5000.00"),
-            transaction_hash="hash2",
-        ),
-    ]
-
-    count = insert_transactions(mock_conn, txns)
+    count = insert_transactions(mock_conn, [_txn("a", "h1"), _txn("b", "h2")])
     assert cursor_mock.execute.call_count == 2
     mock_conn.commit.assert_called_once()
     assert count == 2

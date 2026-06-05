@@ -4,13 +4,18 @@
 
 ## Table: `transactions`
 
+> **Schema is managed by yoyo-migrations** (added in feature 002). See `migrations/`
+> for the full DDL history.
+
 ```sql
+-- After migration 0002_add_account_label (feature 002):
 CREATE TABLE IF NOT EXISTS transactions (
     id               SERIAL PRIMARY KEY,
     posted_date      DATE           NOT NULL,
     effective_date   DATE,
     description      TEXT,
     amount           NUMERIC(15, 2) NOT NULL,
+    account_label    TEXT           NOT NULL DEFAULT 'unknown',
     transaction_hash TEXT           NOT NULL,
     CONSTRAINT uq_transaction_hash UNIQUE (transaction_hash)
 );
@@ -25,7 +30,8 @@ CREATE TABLE IF NOT EXISTS transactions (
 | `effective_date` | YES | Derived date from MEMO pattern `DD/MM HH:MM`; null when pattern not matched |
 | `description` | YES | Transaction description; from MEMO (full or split) |
 | `amount` | NO | Transaction amount; positive = credit, negative = debit |
-| `transaction_hash` | NO | SHA-256 of source fields; unique — idempotency key |
+| `account_label` | NO | User-supplied account identifier (added in feature 002); rows from feature 001 default to `'unknown'` |
+| `transaction_hash` | NO | SHA-256 of source fields + account_label; unique — idempotency key |
 
 ## Idempotency
 
