@@ -14,7 +14,7 @@ htmlcov/
 .env
 .DS_Store
 Thumbs.db
-config/
+config/.env
 
 .specify/scripts/
 .specify/extensions.yml
