@@ -22,3 +22,12 @@ def test_account_label_migration_exists():
     content = migration.read_text()
     assert "account_label" in content
     assert "ALTER TABLE" in content
+
+
+def test_daily_balance_migration_exists():
+    migration = MIGRATIONS_DIR / "0004_create_daily_balance.sql"
+    assert migration.exists()
+    content = migration.read_text()
+    assert "daily_balance" in content
+    assert "balance_date" in content
+    assert "difference" in content
