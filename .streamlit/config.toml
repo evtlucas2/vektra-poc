@@ -1,0 +1,7 @@
+# Force dark mode on every load, regardless of the viewer's system/browser theme.
+[theme]
+base = "dark"
+
+# Hide the toolbar menu so the theme switcher (light-mode option) is not reachable.
+[client]
+toolbarMode = "minimal"
