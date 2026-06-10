@@ -20,6 +20,8 @@ from src.timeseries.plot import build_decomposition_figure
 
 _ENV_FILE = Path(__file__).parent.parent.parent / "config" / ".env"
 
+APP_TITLE = "Vektra - Data science for personal finance"
+
 
 def _load_series():
     database_url = os.environ.get("DATABASE_URL", "")
@@ -47,10 +49,12 @@ def _render(series, period: int) -> None:
 
 
 def main() -> None:
+    st.set_page_config(page_title=APP_TITLE)
     load_dotenv(_ENV_FILE)
-    st.title("Daily Balance Decomposition")
+    st.title(APP_TITLE)
     period = st.sidebar.number_input("Seasonal period (days)", min_value=2, value=DEFAULT_PERIOD)
     _render(_load_series(), int(period))
 
 
-main()
+if __name__ == "__main__":
+    main()

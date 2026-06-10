@@ -143,3 +143,23 @@ Suggestion from speckit: Ready for /speckit-tasks or /speckit-implement directly
 ```
 /speckit-implement
 ```
+
+### Feature 6: Dark mode and title
+
+![Dark main screen](images/dark_main_screen.png)
+
+```
+/speckit-specify Define the theme of the code as always dark mode, and change the title to "Vektra - Data science for personal finance"
+```
+
+```
+/speckit-plan
+```
+
+```
+/speckit-tasks
+```
+
+```
+/speckit-implement
+```
