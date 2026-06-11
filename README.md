@@ -163,3 +163,17 @@ Suggestion from speckit: Ready for /speckit-tasks or /speckit-implement directly
 ```
 /speckit-implement
 ```
+
+### Feature 7: Default seasonality
+
+```
+/speckit-specify Define the default seasonality as 30 days.
+```
+
+```
+take it straight through to implement 
+```
+
+The description above was a claude's suggestion.
+
+
