@@ -178,7 +178,7 @@ The description above was a claude's suggestion.
 
 ### Feature 8: Percentile 5 of days with greatest expenses 
 
-![Dark main screen](images/highest.png)
+![Dark main screen](images/highest_expenses.png)
 
 ```
 /speckit-specify Create a table on the main page that displays the 5th percentile of the days with the highest expenses available in the daily_balance table, in descending order. Add the table below the daily balance decomposition chart.
