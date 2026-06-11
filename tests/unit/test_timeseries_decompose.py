@@ -14,8 +14,22 @@ def _weekly_series(weeks=4):
     return pd.Series(base + seasonal, index=idx)
 
 
-def test_default_period_is_seven():
-    assert DEFAULT_PERIOD == 7
+def test_default_period_is_thirty():
+    assert DEFAULT_PERIOD == 30
+
+
+def _daily_series(n):
+    idx = pd.date_range("2026-01-01", periods=n, freq="D")
+    return pd.Series(np.arange(n) * 1.0, index=idx)
+
+
+def test_default_requires_sixty_points():
+    # With the default 30-day period, two cycles = 60 points are required.
+    with pytest.raises(ValueError, match="60"):
+        decompose_balance(_daily_series(59))  # no period override -> uses default 30
+    # Exactly 60 points succeeds at the default period.
+    result = decompose_balance(_daily_series(60))
+    assert len(result.observed) == 60
 
 
 def test_returns_four_components():

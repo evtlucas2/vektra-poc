@@ -1,7 +1,7 @@
 import pandas as pd
 from statsmodels.tsa.seasonal import DecomposeResult, seasonal_decompose
 
-DEFAULT_PERIOD = 7  # weekly seasonality
+DEFAULT_PERIOD = 30  # monthly (approx) seasonality
 
 
 def decompose_balance(series: pd.Series, period: int = DEFAULT_PERIOD) -> DecomposeResult:
