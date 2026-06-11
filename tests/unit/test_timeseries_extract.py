@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import pandas as pd
 import pytest
 
-from src.timeseries.extract import fetch_balance_series
+from src.timeseries.extract import fetch_balance_series, fetch_daily_balance_frame
 
 
 @pytest.fixture
@@ -41,3 +41,28 @@ def test_fetch_balance_series_empty(mock_conn, cursor_mock):
     series = fetch_balance_series(mock_conn)
     assert isinstance(series, pd.Series)
     assert len(series) == 0
+
+
+def test_fetch_daily_balance_frame_returns_dataframe(mock_conn, cursor_mock):
+    cursor_mock.fetchall.return_value = [
+        (date(2026, 1, 5), 0, 0, Decimal("1000.00"), Decimal("0.00")),
+        (date(2026, 1, 6), 1, 0, Decimal("900.00"), Decimal("-100.00")),
+    ]
+    frame = fetch_daily_balance_frame(mock_conn)
+
+    assert isinstance(frame, pd.DataFrame)
+    assert list(frame.columns) == [
+        "balance_date", "day_of_week", "weekend", "balance", "difference"
+    ]
+    assert len(frame) == 2
+    assert float(frame.iloc[1]["difference"]) == -100.0
+
+
+def test_fetch_daily_balance_frame_empty(mock_conn, cursor_mock):
+    cursor_mock.fetchall.return_value = []
+    frame = fetch_daily_balance_frame(mock_conn)
+    assert isinstance(frame, pd.DataFrame)
+    assert frame.empty
+    assert list(frame.columns) == [
+        "balance_date", "day_of_week", "weekend", "balance", "difference"
+    ]
